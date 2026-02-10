@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IssuePilot_v1.0</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            /* VS Code Dark+ inspired palette */
+            --bg-color: #1e1e1e;
+            --sidebar-bg: #252526;
+            --activity-bar: #333333;
+            --text-main: #d4d4d4;
+            --text-muted: #858585;
+            --border-color: #454545;
+            --accent: #007acc;
+            --keyword: #569cd6;
+            --string: #ce9178;
+            --class: #4ec9b0;
+            --function: #dcdcaa;
+            --comment: #6a9955;
+            --error: #f14c4c;
+            --warning: #cca700;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar similar to IDE Activity Bar */
+        .activity-bar {
+            width: 50px;
+            background-color: var(--activity-bar);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 10px;
+            border-right: 1px solid #1f1f1f;
+        }
+
+        .activity-icon {
+            width: 30px;
+            height: 30px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .activity-icon:hover,
+        .activity-icon.active {
+            opacity: 1;
+            border-left: 2px solid var(--text-main);
+        }
+
+        /* Main Content Area */
+        .main-layout {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--sidebar-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 1rem;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.85rem;
+        }
+
+        .breadcrumb {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-muted);
+        }
+
+        .breadcrumb span {
+            color: var(--text-main);
+        }
+
+        .workspace {
+            padding: 20px;
+            overflow-y: auto;
+            display: grid;
+            grid-template-rows: auto auto 1fr;
+            gap: 20px;
+            height: 100%;
+        }
+
+        /* Stats Panel */
+        .stats-panel {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .stat-card {
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 4px;
+            /* Minimal radius */
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-label {
+            color: var(--comment);
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            color: var(--class);
+            font-weight: 600;
+        }
+
+        /* Terminal-style Controls */
+        .terminal-controls {
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            display: flex;
+            gap: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            align-items: center;
+        }
+
+        .prompt {
+            color: var(--comment);
+            user-select: none;
+        }
+
+        input[type="text"] {
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            flex: 1;
+            outline: none;
+        }
+
+        .btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 4px 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border-radius: 2px;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        /* Code-style Table */
+        .code-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+        }
+
+        .code-table th {
+            text-align: left;
+            padding: 8px;
+            color: var(--keyword);
+            /* Blueish for headers */
+            border-bottom: 1px solid var(--border-color);
+            font-weight: normal;
+        }
+
+        .code-table td {
+            padding: 8px;
+            border-bottom: 1px solid #2d2d2d;
+            color: var(--text-muted);
+        }
+
+        .code-table tr:hover td {
+            background-color: #2a2d2e;
+            color: var(--text-main);
+        }
+
+        .id-col {
+            color: var(--function) !important;
+        }
+
+        .string-col {
+            color: var(--string) !important;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 2px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .status-new {
+            color: var(--class);
+            border: 1px solid var(--class);
+        }
+
+        .status-triaged {
+            color: var(--comment);
+            border: 1px solid var(--comment);
+        }
+
+        select {
+            background: #3c3c3c;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            font-family: 'JetBrains Mono', monospace;
+            padding: 2px;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #424242;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4f4f4f;
+        }
+
+        /* Charts Overlay */
+        .chart-overlay {
+            position: absolute;
+            background: rgba(30, 30, 30, 0.95);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            display: none;
+            z-index: 10;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- IDE Activity Bar -->
+    <div class="activity-bar">
+        <div class="activity-icon active" title="Explorer">📂</div>
+        <div class="activity-icon" title="Search">🔍</div>
+        <div class="activity-icon" title="Source Control">⚡</div>
+        <div class="activity-icon" title="Debug" onclick="toggleCharts()">📈</div>
+        <div class="activity-icon" style="margin-top: auto;" title="Settings">⚙️</div>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+        <header>
+            <div class="breadcrumb">issue-pilot > <span>dashboard</span></div>
+            <div style="display: flex; gap: 10px;">
+                <span id="connectionStatus" style="color: var(--comment); font-size: 0.8rem;">● Connected</span>
+                <a href="#" onclick="logout()" style="color: var(--text-muted); text-decoration: none;">[Logout]</a>
+            </div>
+        </header>
+
+        <div class="workspace">
+            <!-- Stats as "Variables" -->
+            <div class="stats-panel">
+                <div class="stat-card">
+                    <div class="stat-label">// total_issues</div>
+                    <div class="stat-value" id="totalCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">// open_bugs</div>
+                    <div class="stat-value" id="bugCount" style="color: var(--error);">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">// active_repo</div>
+                    <div class="stat-value" id="activeRepo" style="font-size: 1rem; line-height: 1.8;">ALL</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">// system_status</div>
+                    <div class="stat-value" style="color: var(--accent);">ONLINE</div>
+                </div>
+            </div>
+
+            <!-- Terminal Filter -->
+            <div class="terminal-controls">
+                <span class="prompt">user@os:~/issues$</span>
+                <span style="color: var(--function);">filter</span>
+                <span style="color: var(--text-muted);">--repo</span>
+                <input type="text" id="repoFilter" placeholder="owner/repo" onchange="fetchIssues()" spellcheck="false">
+                <button class="btn" onclick="fetchIssues()">EXECUTE</button>
+                <div style="flex: 1;"></div>
+                <span class="prompt" style="font-size: 0.8rem; margin-right: 10px;" id="pageInfo">Page 1</span>
+                <button class="btn" style="background: var(--sidebar-bg); border: 1px solid var(--border-color);"
+                    onclick="changePage(-1)">PREV</button>
+                <button class="btn" style="background: var(--sidebar-bg); border: 1px solid var(--border-color);"
+                    onclick="changePage(1)">NEXT</button>
+                <button class="btn" style="text-decoration: none; margin-left: 10px;"
+                    onclick="exportCSV()">EXPORT.CSV</button>
+            </div>
+
+            <!-- Code Table -->
+            <table class="code-table" id="issuesTable">
+                <thead>
+                    <tr>
+                        <th># id</th>
+                        <th>repository</th>
+                        <th>title</th>
+                        <th>status</th>
+                        <th>label</th>
+                        <th>score</th>
+                        <th>link</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Hidden Chart Overlay -->
+    <div class="chart-overlay" id="chartModal">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+            <h3 style="margin: 0; color: var(--text-main);">Analytics Visualization</h3>
+            <button class="btn" onclick="toggleCharts()" style="background: var(--error);">CLOSE</button>
+        </div>
+        <div style="display: flex; gap: 20px;">
+            <div style="width: 300px; height: 300px;"><canvas id="statusChart"></canvas></div>
+            <div style="width: 300px; height: 300px;"><canvas id="labelChart"></canvas></div>
+        </div>
+    </div>
+
+    <script>
+        let currentOffset = 0;
+        const limit = 20;
+        // Auth Check
+        const apiKey = localStorage.getItem('issuepilot_api_key');
+        if (!apiKey) window.location.href = '/login';
+
+        // Chart Config
+        Chart.defaults.color = '#858585';
+        Chart.defaults.borderColor = '#333';
+        Chart.defaults.font.family = "'JetBrains Mono', monospace";
+
+        function logout() {
+            localStorage.removeItem('issuepilot_api_key');
+            window.location.href = '/login';
+        }
+
+        function toggleCharts() {
+            const el = document.getElementById('chartModal');
+            el.style.display = el.style.display === 'block' ? 'none' : 'block';
+            if (el.style.display === 'block') fetchStats();
+        }
+
+        async function fetchStats() {
+            try {
+                const res = await fetch('/stats', { headers: { 'X-API-Key': apiKey } });
+                if (res.status === 401) logout();
+                const data = await res.json();
+
+                // Update "Variables"
+                document.getElementById('totalCount').innerText = data.total;
+                document.getElementById('bugCount').innerText = data.label_counts['bug'] || 0;
+
+                // Render Charts
+                renderChart('statusChart', 'Status Distribution', data.status_counts);
+                renderChart('labelChart', 'Label Distribution', data.label_counts);
+            } catch (err) { console.error(err); }
+        }
+
+        function renderChart(id, title, data) {
+            const ctx = document.getElementById(id).getContext('2d');
+            if (window.myCharts && window.myCharts[id]) window.myCharts[id].destroy();
+            if (!window.myCharts) window.myCharts = {};
+
+            window.myCharts[id] = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(data),
+                    datasets: [{
+                        data: Object.values(data),
+                        backgroundColor: ['#4ec9b0', '#007acc', '#ce9178', '#dcdcaa', '#6a9955'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    plugins: {
+                        title: { display: true, text: title, color: '#d4d4d4' },
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+
+        async function exportCSV() {
+            try {
+                const response = await fetch('/export', {
+                    headers: { 'X-API-Key': apiKey }
+                });
+
+                if (response.status === 401) { logout(); return; }
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'issues_export.csv';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+            } catch (err) { alert('Export failed'); }
+        }
+
+        function changePage(direction) {
+            const newOffset = currentOffset + (direction * limit);
+            if (newOffset >= 0) {
+                currentOffset = newOffset;
+                fetchIssues();
+            }
+        }
+
+        async function updateLabel(id, newLabel) {
+            try {
+                await fetch(`/issues/${id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json', 'X-API-Key': apiKey },
+                    body: JSON.stringify({ label: newLabel })
+                });
+                fetchIssues();
+            } catch (err) { alert('Update failed'); }
+        }
+
+        async function fetchIssues() {
+            try {
+                const repo = document.getElementById('repoFilter').value;
+                document.getElementById('activeRepo').innerText = repo ? repo : 'ALL';
+
+                let url = `/issues?limit=${limit}&offset=${currentOffset}`;
+                if (repo) url += `&repository=${repo}`;
+
+                const response = await fetch(url, { headers: { 'X-API-Key': apiKey } });
+                if (response.status === 401) logout();
+
+                const data = await response.json();
+                const tbody = document.querySelector('#issuesTable tbody');
+                tbody.innerHTML = '';
+
+                data.items.forEach(issue => {
+                    const row = document.createElement('tr');
+                    const pred = issue.predicted_label || 'none';
+
+                    row.innerHTML = `
+                        <td class="id-col">${issue.number}</td>
+                        <td style="color: var(--text-muted);">${issue.repository || '-'}</td>
+                        <td class="string-col">"${issue.title}"</td>
+                        <td><span class="status-badge status-${issue.status}">${issue.status}</span></td>
+                        <td>
+                            <select onchange="updateLabel(${issue.id}, this.value)">
+                                <option value="bug" ${pred === 'bug' ? 'selected' : ''}>bug</option>
+                                <option value="feature" ${pred === 'feature' ? 'selected' : ''}>feature</option>
+                                <option value="documentation" ${pred === 'documentation' ? 'selected' : ''}>docs</option>
+                            </select>
+                        </td>
+                        <td style="color: var(--warning);">${issue.priority_score}</td>
+                        <td><a href="${issue.html_url}" target="_blank" style="color: var(--accent);">-></a></td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                // Fetch stats to update sidebar
+                fetchStats();
+                const currentPage = Math.floor(currentOffset / limit) + 1;
+                const totalPages = Math.ceil(data.total / limit) || 1;
+                document.getElementById('pageInfo').innerText = `Page ${currentPage}/${totalPages}`;
+
+            } catch (error) { console.error(error); }
+        }
+
+        fetchIssues();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,12 @@
+[
+  {"text": "Application crash on startup when loading config", "label": "bug"},
+  {"text": "NullPointerException in user login flow", "label": "bug"},
+  {"text": "Add support for dark mode theme", "label": "feature"},
+  {"text": "Improve documentation for API endpoints", "label": "documentation"},
+  {"text": "Typo in README installation instructions", "label": "documentation"},
+  {"text": "Feature request: Export data to CSV", "label": "feature"},
+  {"text": "Button not responding after update", "label": "bug"},
+  {"text": "Please add a tutorial for new users", "label": "documentation"},
+  {"text": "Enhancement: Add search functionality", "label": "feature"},
+  {"text": "Error 500 when accessing profile page", "label": "bug"}
+]

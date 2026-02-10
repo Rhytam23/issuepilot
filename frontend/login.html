@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Login // IssuePilot</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'JetBrains Mono', monospace;
+            display: flex;
+            height: 100vh;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+
+        .window {
+            background: #252526;
+            border: 1px solid #454545;
+            padding: 2px;
+            width: 400px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .title-bar {
+            background: #3c3c3c;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .content {
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        h1 {
+            font-size: 1.2rem;
+            margin: 0;
+            color: #4ec9b0;
+            /* Class color */
+        }
+
+        .input-line {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label {
+            color: #569cd6;
+            /* Keyword color */
+            font-size: 0.9rem;
+        }
+
+        input {
+            background: #1e1e1e;
+            border: 1px solid #454545;
+            color: #ce9178;
+            /* String color */
+            padding: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #007acc;
+        }
+
+        button {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .comment {
+            color: #6a9955;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="window">
+        <div class="title-bar">
+            <span>root@issuepilot:~</span>
+            <span>X</span>
+        </div>
+        <div class="content">
+            <div>
+                <h1>class SessionHandler:</h1>
+                <div class="comment"> # Please authenticate to continue</div>
+            </div>
+            <form id="loginForm" class="input-line">
+                <label>def login(api_key):</label>
+                <input type="password" id="apiKey" placeholder="<enter_key_here>" required>
+                <button type="submit">return True</button>
+            </form>
+            <div id="msg" style="color: #f14c4c; display: none;">Error: AuthenticationFailed</div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const apiKey = document.getElementById('apiKey').value.trim();
+            try {
+                const res = await fetch('/stats', { headers: { 'X-API-Key': apiKey } });
+                if (res.ok) {
+                    localStorage.setItem('issuepilot_api_key', apiKey);
+                    window.location.href = '/dashboard';
+                } else {
+                    document.getElementById('msg').style.display = 'block';
+                }
+            } catch (err) { alert('Connection Error'); }
+        });
+    </script>
+</body>
+
+</html>

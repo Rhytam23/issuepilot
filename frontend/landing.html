@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IssuePilot - Automated GitHub Issue Triage</title>
+    <style>
+        :root {
+            --primary: #6f42c1;
+            --primary-hover: #5a32a3;
+            --bg: #0d1117;
+            --text: #c9d1d9;
+            --heading: #ffffff;
+            --card-bg: #161b22;
+            --border: #30363d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        header {
+            padding: 2rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--heading);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo span {
+            color: var(--primary);
+        }
+
+        .nav-btn {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--heading);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .nav-btn:hover {
+            border-color: var(--text);
+        }
+
+        .hero {
+            padding: 8rem 5%;
+            text-align: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: radial-gradient(circle at top, #1f1830 0%, transparent 70%);
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            color: var(--heading);
+            margin-bottom: 1.5rem;
+            letter-spacing: -1px;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto 2.5rem;
+            color: #8b949e;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-decoration: none;
+            transition: 0.3s;
+            box-shadow: 0 4px 14px rgba(111, 66, 193, 0.4);
+        }
+
+        .cta-btn:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .features {
+            padding: 5rem 5%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 2rem;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .feature-card h3 {
+            color: var(--heading);
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 3rem;
+            border-top: 1px solid var(--border);
+            margin-top: 5rem;
+            color: #8b949e;
+        }
+
+        /* Demo UI Mockup */
+        .demo-ui {
+            margin-top: 4rem;
+            background: #000;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .demo-ui img {
+            width: 100%;
+            display: block;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">🚀 Issue<span>Pilot</span></div>
+        <a href="/dashboard" class="nav-btn">Go to Dashboard</a>
+    </header>
+
+    <section class="hero">
+        <h1>Autopilot for your GitHub Issues</h1>
+        <p>Stop drowning in notifications. IssuePilot uses AI to automatically classify, prioritize, and route incoming
+            issues so you can focus on shipping code.</p>
+        <a href="/dashboard" class="cta-btn">Launch Dashboard</a>
+
+        <!-- CSS-only mockup representation -->
+        <div class="demo-ui">
+            <div
+                style="padding: 15px; border-bottom: 1px solid #30363d; display: flex; gap: 10px; background: #161b22;">
+                <div style="width: 12px; height: 12px; border-radius: 50%; background: #ff5f56;"></div>
+                <div style="width: 12px; height: 12px; border-radius: 50%; background: #ffbd2e;"></div>
+                <div style="width: 12px; height: 12px; border-radius: 50%; background: #27c93f;"></div>
+            </div>
+            <div style="padding: 40px; text-align: left; font-family: monospace; color: #8b949e;">
+                <div
+                    style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #30363d; padding-bottom: 10px;">
+                    <span>ID: #402</span>
+                    <span
+                        style="color: #d73a49; border: 1px solid #d73a49; padding: 2px 6px; border-radius: 4px;">bug</span>
+                    <span style="color: #fff;">Login fails on 2FA</span>
+                    <span style="color: #28a745;">Score: 85</span>
+                </div>
+                <div
+                    style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #30363d; padding-bottom: 10px;">
+                    <span>ID: #403</span>
+                    <span
+                        style="color: #0366d6; border: 1px solid #0366d6; padding: 2px 6px; border-radius: 4px;">feature</span>
+                    <span style="color: #fff;">Dark mod support</span>
+                    <span style="color: #aaa;">Score: 42</span>
+                </div>
+                <div
+                    style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #30363d; padding-bottom: 10px;">
+                    <span>ID: #404</span>
+                    <span
+                        style="color: #6f42c1; border: 1px solid #6f42c1; padding: 2px 6px; border-radius: 4px;">triaged</span>
+                    <span style="color: #fff;">Update documentation</span>
+                    <span style="color: #aaa;">Score: 15</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="feature-card">
+            <div class="feature-icon">🤖</div>
+            <h3>AI-Powered Triage</h3>
+            <p>Automatically tags issues as bugs, features, or questions using advanced NLP, saving you hours of manual
+                sorting.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Smart Prioritization</h3>
+            <p>Calculates a priority score based on keywords, age, and activity, ensuring critical bugs get attention
+                first.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3>Visual Analytics</h3>
+            <p>Gain insights into your repo's health with real-time charts showing issue distribution and status trends.
+            </p>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 IssuePilot. Open Source AI Tool.</p>
+    </footer>
+
+</body>
+
+</html>

@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  web:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - REPO_NAME=${REPO_NAME}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - WEBHOOK_SECRET=${WEBHOOK_SECRET}
+    volumes:
+      - ./data:/app/data
+      - ./model_artifacts:/app/model_artifacts
+      - ./issue_pilot.db:/app/issue_pilot.db
