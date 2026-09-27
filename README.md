@@ -120,3 +120,23 @@ pytest backend/tests
 
 ## License
 MIT License. Open Source for everyone.
+
+---
+
+## 📖 Project Understanding (Future Reference)
+
+An automated GitHub issue triage system for open-source maintainers: a TF-IDF + Naive Bayes
+model classifies incoming issues, a priority score (keywords + age) surfaces what matters, and a
+dark-mode, IDE-styled dashboard gives a filterable, multi-repo view of issue health. Ships with a
+one-command Docker Compose setup.
+
+**Stack:** Python/ML backend (TF-IDF + Naive Bayes classifier), frontend dashboard, SQLite
+storage (`storage.db`), Docker Compose deployment.
+**Status:** functional dev-tooling project with a working quick-start.
+
+## 🎯 Where This Can Be Used
+
+- Real tooling for maintaining your own (or a team's) open-source repos.
+- Portfolio piece demonstrating applied ML + a real operational dashboard, not just a notebook.
+- **Hackathons:** strong fit for "dev tools" / "AI for open source" tracks — the Docker
+  quick-start means it can be demoed live in minutes without a fragile local setup.
